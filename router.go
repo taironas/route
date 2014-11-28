@@ -17,20 +17,14 @@ type Router struct {
 	routes []*route
 }
 
-// Handler that appends a new pattern, handler pair to the routes.
-func (r *Router) Handler(pattern *regexp.Regexp, handler http.Handler) {
-	r.routes = append(r.routes, &route{pattern, handler})
-}
-
-// main handler function used, it encapsulate string pattern start and end.
+// HandleFunc registers the handler function for the given pattern in the router.
 func (r *Router) HandleFunc(strPattern string, handler func(http.ResponseWriter, *http.Request)) {
-	// encapsulate string pattern with start and end constraints
-	// so that HandleFunc would work as for Python GAE
+	// encapsulate string pattern with start and end constraints.
 	pattern := regexp.MustCompile("^" + strPattern + "$")
 	r.routes = append(r.routes, &route{pattern, http.HandlerFunc(handler)})
 }
 
-// looks for a matching route among the routes. Returns 404 if no match is found
+// ServeHTTP looks for a matching route among the routes. Returns 404 if no match is found.
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	for _, route := range r.routes {
 		if route.pattern.MatchString(req.URL.Path) {
