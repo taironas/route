@@ -7,18 +7,28 @@ import (
 	"testing"
 )
 
-var endpoints = []string{"/test/handler/1", "/test/handler/2"}
+var endpoints = []string{
+	"/test/handler/1/?",
+	"/test/handler/2/?",
+}
 
 func TestRouter(t *testing.T) {
 	r := new(Router)
-	r.HandleFunc(endpoints[0], testHandler1)
-	r.HandleFunc(endpoints[1], testHandler2)
+	r.HandleFunc(endpoints[0], handler1)
+	r.HandleFunc(endpoints[1], handler2)
 
 	server := httptest.NewServer(r)
 	defer server.Close()
 
-	for _, endpoint := range endpoints {
-		res, err := http.Get(server.URL + endpoint)
+	var urls = []string{
+		"/test/handler/1",
+		"/test/handler/2",
+		"/test/handler/1/",
+		"/test/handler/2/",
+	}
+
+	for _, u := range urls {
+		res, err := http.Get(server.URL + u)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -31,8 +41,8 @@ func TestRouter(t *testing.T) {
 
 func TestNotFoundRoute(t *testing.T) {
 	r := new(Router)
-	r.HandleFunc(endpoints[0], testHandler1)
-	r.HandleFunc(endpoints[1], testHandler2)
+	r.HandleFunc(endpoints[0], handler1)
+	r.HandleFunc(endpoints[1], handler2)
 
 	server := httptest.NewServer(r)
 	defer server.Close()
@@ -49,24 +59,33 @@ func TestNotFoundRoute(t *testing.T) {
 
 func TestFoundRegexpRoute(t *testing.T) {
 	r := new(Router)
-	r.HandleFunc("/test/handler/[0-9]/hello", testHandlerHello)
+	r.HandleFunc("/test/handler/[0-9]+/hello/?", handlerHello)
+
+	urls := []string{
+		"/test/handler/1/hello",
+		"/test/handler/2/hello/",
+		"/test/handler/2123/hello/",
+		"/test/handler/2123/hello",
+	}
 
 	server := httptest.NewServer(r)
 	defer server.Close()
 
-	res, err := http.Get(server.URL + "/test/handler/1/hello")
-	if err != nil {
-		t.Fatal(err)
+	for _, u := range urls {
+		res, err := http.Get(server.URL + u)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if res.StatusCode != http.StatusOK {
+			t.Fatal(res)
+		}
 	}
 
-	if res.StatusCode != http.StatusOK {
-		t.Fatal(res)
-	}
 }
 
 func TestNotFoundRegexpRoute(t *testing.T) {
 	r := new(Router)
-	r.HandleFunc("/test/handler/[0-9]/hello", testHandlerHello)
+	r.HandleFunc("/test/handler/[0-9]/hello", handlerHello)
 
 	server := httptest.NewServer(r)
 	defer server.Close()
@@ -81,14 +100,14 @@ func TestNotFoundRegexpRoute(t *testing.T) {
 	}
 }
 
-func testHandler1(w http.ResponseWriter, r *http.Request) {
+func handler1(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "testHandler1 has been reached!")
 }
 
-func testHandler2(w http.ResponseWriter, r *http.Request) {
+func handler2(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "testHandler2 has been reached!")
 }
 
-func testHandlerHello(w http.ResponseWriter, r *http.Request) {
+func handlerHello(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "testHandlerHello has been reached!")
 }
