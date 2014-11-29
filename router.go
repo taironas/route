@@ -6,8 +6,8 @@ import (
 )
 
 // inspired by the following sources with some small changes:
-//http://stackoverflow.com/questions/6564558/wildcards-in-the-pattern-for-http-handlefunc
-//https://github.com/raymi/quickerreference
+// http://stackoverflow.com/questions/6564558/wildcards-in-the-pattern-for-http-handlefunc
+// https://github.com/raymi/quickerreference
 type route struct {
 	pattern *regexp.Regexp
 	handler http.Handler

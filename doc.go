@@ -11,8 +11,8 @@
 //  func main() {
 //    r := new(route.Router)
 //    r.HandleFunc("/users/?", usersHandler)
-//    r.HandleFunc("/users/[0-9]+", userHandler)
-//    r.HandleFunc("/users/[0-9]+/friends/[a-zA-Z]+", friendHandler)
+//    r.HandleFunc("/users/[0-9]+/?", userHandler)
+//    r.HandleFunc("/users/[0-9]+/friends/[a-zA-Z]+/?", friendHandler)
 //
 //    http.ListenAndServe(":8080", r)
 //  }

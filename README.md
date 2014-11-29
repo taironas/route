@@ -1,7 +1,7 @@
 route
 =====
 
-taironas/route is an URL router in Go allowing usage of regexp in URL paths.
+taironas/route is an URL router for Go allowing usage of regexp in URL paths.
 
 ## Getting Started
 
@@ -19,8 +19,8 @@ import (
 func main() {
   r := new(route.Router)
   r.HandleFunc("/users/?", usersHandler)
-  r.HandleFunc("/users/[0-9]+", userHandler)
-  r.HandleFunc("/users/[0-9]+/friends/[a-zA-Z]+", friendHandler)
+  r.HandleFunc("/users/[0-9]+/?", userHandler)
+  r.HandleFunc("/users/[0-9]+/friends/[a-zA-Z]+/?", friendHandler)
 
   http.ListenAndServe(":8080", r)
 }
@@ -65,5 +65,5 @@ You will now have a Go net/http webserver running on `localhost:8080`.
 ## Documentation
 
 ~~~
-godoc -http=:6060
+> godoc -http=:6060
 ~~~
