@@ -17,11 +17,16 @@ type Router struct {
 	routes []*route
 }
 
-// HandleFunc registers the handler function for the given pattern in the router.
-func (r *Router) HandleFunc(strPattern string, handler func(http.ResponseWriter, *http.Request)) {
+// Handle registers the handler for the given pattern in the router.
+func (r *Router) Handle(strPattern string, handler http.Handler) {
 	// encapsulate string pattern with start and end constraints.
 	pattern := regexp.MustCompile("^" + strPattern + "$")
-	r.routes = append(r.routes, &route{pattern, http.HandlerFunc(handler)})
+	r.routes = append(r.routes, &route{pattern, handler})
+}
+
+// HandleFunc registers the handler function for the given pattern in the router.
+func (r *Router) HandleFunc(strPattern string, handler func(http.ResponseWriter, *http.Request)) {
+	r.Handle(strPattern, http.HandlerFunc(handler))
 }
 
 // ServeHTTP looks for a matching route among the routes. Returns 404 if no match is found.

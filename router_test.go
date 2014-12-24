@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
@@ -94,10 +95,31 @@ func TestNotFoundRegexpRoute(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	if res.StatusCode != http.StatusNotFound {
 		t.Fatal(res)
 	}
+}
+
+func TestFileServerRoute(t *testing.T) {
+	testingPath := "/temp_TestFileServerRoute"
+
+	createTestingData(testingPath)
+
+	r := new(Router)
+	r.Handle("/", http.FileServer(http.Dir(testingPath)))
+
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	res, err := http.Get(server.URL + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.StatusCode != http.StatusOK {
+		t.Fatal(res)
+	}
+
+	cleanTestingData(testingPath)
 }
 
 func handler1(w http.ResponseWriter, r *http.Request) {
@@ -110,4 +132,18 @@ func handler2(w http.ResponseWriter, r *http.Request) {
 
 func handlerHello(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "testHandlerHello has been reached!")
+}
+
+func createTestingData(nameTest string) {
+	src, err := os.Stat(nameTest)
+	if err != nil || !src.IsDir() {
+		os.Mkdir(nameTest, 0777)
+	}
+}
+
+func cleanTestingData(nameTest string) {
+	src, err := os.Stat(nameTest)
+	if err == nil && src.IsDir() {
+		os.Remove(nameTest)
+	}
 }
