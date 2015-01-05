@@ -102,8 +102,8 @@ func TestNotFoundRegexpRoute(t *testing.T) {
 
 func TestServeStaticResources(t *testing.T) {
 	rootTestingPath := "/temp_TestServeStaticResources"
-	cssTestingPath := rootTestingPath+"/css"
-	jsTestingPath := rootTestingPath+"/js"
+	cssTestingPath := rootTestingPath + "/css"
+	jsTestingPath := rootTestingPath + "/js"
 
 	createTestingData(rootTestingPath)
 
@@ -129,7 +129,7 @@ func TestServeStaticResources(t *testing.T) {
 
 func TestServeTwoLevelStaticResources(t *testing.T) {
 	rootTestingPath := "/temp_TestServeStaticResources"
-	cssTestingPath := rootTestingPath+"/css"
+	cssTestingPath := rootTestingPath + "/css"
 
 	createTestingData(rootTestingPath)
 
@@ -153,7 +153,7 @@ func TestServeTwoLevelStaticResources(t *testing.T) {
 
 func TestServeNonExistingStaticResources(t *testing.T) {
 	rootTestingPath := "/temp_TestServeStaticResources"
-	jsTestingPath := rootTestingPath+"/js"
+	jsTestingPath := rootTestingPath + "/js"
 
 	createTestingData(rootTestingPath)
 
@@ -193,21 +193,21 @@ func createTestingData(rootTestPath string) {
 		os.Mkdir(rootTestPath, 0777)
 	}
 
-	src, err = os.Stat(rootTestPath+"/index.html")
+	src, err = os.Stat(rootTestPath + "/index.html")
 	if err != nil || src.IsDir() {
-		os.Create(rootTestPath+"/index.html")
+		os.Create(rootTestPath + "/index.html")
 	}
 
-	cssTestPath := rootTestPath+"/css"
+	cssTestPath := rootTestPath + "/css"
 
 	src, err = os.Stat(cssTestPath)
 	if err != nil || !src.IsDir() {
 		os.Mkdir(cssTestPath, 0777)
 	}
 
-	src, err = os.Stat(cssTestPath+"/main.css")
+	src, err = os.Stat(cssTestPath + "/main.css")
 	if err != nil || src.IsDir() {
-		os.Create(cssTestPath+"/main.css")
+		os.Create(cssTestPath + "/main.css")
 	}
 }
 
