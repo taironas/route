@@ -101,12 +101,16 @@ func TestNotFoundRegexpRoute(t *testing.T) {
 }
 
 func TestServeStaticResources(t *testing.T) {
-	testingPath := "/temp_TestServeStaticResources"
+	rootTestingPath := "/temp_TestServeStaticResources"
+	cssTestingPath := rootTestingPath+"/css"
+	jsTestingPath := rootTestingPath+"/js"
 
-	createTestingData(testingPath)
+	createTestingData(rootTestingPath)
 
 	r := new(Router)
-	r.AddStaticResource(&testingPath)
+	r.AddStaticResource(&rootTestingPath)
+	r.AddStaticResource(&cssTestingPath)
+	r.AddStaticResource(&jsTestingPath)
 
 	server := httptest.NewServer(r)
 	defer server.Close()
@@ -115,11 +119,60 @@ func TestServeStaticResources(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	if res.StatusCode != http.StatusOK {
 		t.Fatal(res)
 	}
 
-	cleanTestingData(testingPath)
+	cleanTestingData(rootTestingPath)
+}
+
+func TestServeTwoLevelStaticResources(t *testing.T) {
+	rootTestingPath := "/temp_TestServeStaticResources"
+	cssTestingPath := rootTestingPath+"/css"
+
+	createTestingData(rootTestingPath)
+
+	r := new(Router)
+	r.AddStaticResource(&cssTestingPath)
+
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	res, err := http.Get(server.URL + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		t.Fatal(res)
+	}
+
+	cleanTestingData(rootTestingPath)
+}
+
+func TestServeNonExistingStaticResources(t *testing.T) {
+	rootTestingPath := "/temp_TestServeStaticResources"
+	jsTestingPath := rootTestingPath+"/js"
+
+	createTestingData(rootTestingPath)
+
+	r := new(Router)
+	r.AddStaticResource(&jsTestingPath)
+
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	res, err := http.Get(server.URL + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if res.StatusCode != http.StatusNotFound {
+		t.Fatal(res)
+	}
+
+	cleanTestingData(rootTestingPath)
 }
 
 func handler1(w http.ResponseWriter, r *http.Request) {
@@ -134,16 +187,33 @@ func handlerHello(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "testHandlerHello has been reached!")
 }
 
-func createTestingData(nameTest string) {
-	src, err := os.Stat(nameTest)
+func createTestingData(rootTestPath string) {
+	src, err := os.Stat(rootTestPath)
 	if err != nil || !src.IsDir() {
-		os.Mkdir(nameTest, 0777)
+		os.Mkdir(rootTestPath, 0777)
+	}
+
+	src, err = os.Stat(rootTestPath+"/index.html")
+	if err != nil || src.IsDir() {
+		os.Create(rootTestPath+"/index.html")
+	}
+
+	cssTestPath := rootTestPath+"/css"
+
+	src, err = os.Stat(cssTestPath)
+	if err != nil || !src.IsDir() {
+		os.Mkdir(cssTestPath, 0777)
+	}
+
+	src, err = os.Stat(cssTestPath+"/main.css")
+	if err != nil || src.IsDir() {
+		os.Create(cssTestPath+"/main.css")
 	}
 }
 
 func cleanTestingData(nameTest string) {
 	src, err := os.Stat(nameTest)
 	if err == nil && src.IsDir() {
-		os.Remove(nameTest)
+		os.RemoveAll(nameTest)
 	}
 }

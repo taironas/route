@@ -22,7 +22,7 @@ func main() {
   r.HandleFunc("/users/?", usersHandler)
   r.HandleFunc("/users/[0-9]+/?", userHandler)
   r.HandleFunc("/users/[0-9]+/friends/[a-zA-Z]+/?", friendHandler)
-  r.AddStaticResource("path_to_static_resources_directory")
+  r.AddStaticResource("static/images")
 
   http.ListenAndServe(":8080", r)
 }
