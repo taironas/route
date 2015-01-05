@@ -14,8 +14,8 @@ type route struct {
 }
 
 type Router struct {
-	routes       []*route  // array of routes with a tuple (pattern, handler)
-	staticRoutes []*string // array of static routes
+	routes          []*route  // array of routes with a tuple (pattern, handler)
+	staticResources []*string // array of static resources
 }
 
 // Handle registers the handler for the given pattern in the router.
@@ -41,10 +41,10 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// route not found. check if it is a static ressource.
-	for _, sr := range r.staticRoutes {
+	for _, sr := range r.staticResources {
 		dir := http.Dir(*sr)
 		if _, err := dir.Open(req.URL.Path); err == nil {
-			// Could open file, set static route and call ServeHTTP again.
+			// Could open file, set static resource and call ServeHTTP again.
 			r.Handle(req.URL.Path, http.FileServer(dir))
 			r.ServeHTTP(w, req)
 			return
@@ -55,8 +55,8 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	http.NotFound(w, req)
 }
 
-// AddStaticRoute adds a route value to an array of static routes.
-// Use this is you want to serve a static directory and it's sub directories.
-func (r *Router) AddStaticRoute(route *string) {
-	r.staticRoutes = append(r.staticRoutes, route)
+// AddStaticResource adds a resource value to an array of static resources.
+// Use this if you want to serve a static directory and it's sub directories.
+func (r *Router) AddStaticResource(resource *string) {
+	r.staticResources = append(r.staticResources, resource)
 }

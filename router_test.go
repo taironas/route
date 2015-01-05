@@ -100,13 +100,13 @@ func TestNotFoundRegexpRoute(t *testing.T) {
 	}
 }
 
-func TestFileServerRoute(t *testing.T) {
-	testingPath := "/temp_TestFileServerRoute"
+func TestServeStaticResources(t *testing.T) {
+	testingPath := "/temp_TestServeStaticResources"
 
 	createTestingData(testingPath)
 
 	r := new(Router)
-	r.Handle("/", http.FileServer(http.Dir(testingPath)))
+	r.AddStaticResource(&testingPath)
 
 	server := httptest.NewServer(r)
 	defer server.Close()
