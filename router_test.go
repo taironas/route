@@ -13,6 +13,8 @@ var endpoints = []string{
 	"/test/handler/2/?",
 }
 
+var rootTestingPath = "/temp_TestServeStaticResources"
+
 func TestRouter(t *testing.T) {
 	r := new(Router)
 	r.HandleFunc(endpoints[0], handler1)
@@ -101,16 +103,11 @@ func TestNotFoundRegexpRoute(t *testing.T) {
 }
 
 func TestServeStaticResources(t *testing.T) {
-	rootTestingPath := "/temp_TestServeStaticResources"
-	cssTestingPath := rootTestingPath + "/css"
-	jsTestingPath := rootTestingPath + "/js"
 
 	createTestingData(rootTestingPath)
 
 	r := new(Router)
 	r.AddStaticResource(&rootTestingPath)
-	r.AddStaticResource(&cssTestingPath)
-	r.AddStaticResource(&jsTestingPath)
 
 	server := httptest.NewServer(r)
 	defer server.Close()
@@ -128,7 +125,6 @@ func TestServeStaticResources(t *testing.T) {
 }
 
 func TestServeTwoLevelStaticResources(t *testing.T) {
-	rootTestingPath := "/temp_TestServeStaticResources"
 	cssTestingPath := rootTestingPath + "/css"
 
 	createTestingData(rootTestingPath)
@@ -152,7 +148,6 @@ func TestServeTwoLevelStaticResources(t *testing.T) {
 }
 
 func TestServeNonExistingStaticResources(t *testing.T) {
-	rootTestingPath := "/temp_TestServeStaticResources"
 	jsTestingPath := rootTestingPath + "/js"
 
 	createTestingData(rootTestingPath)
