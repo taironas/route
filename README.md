@@ -18,9 +18,11 @@ import (
 
 func main() {
   r := new(route.Router)
+  r.Handle("/", http.FileServer(http.Dir("/static_files")))
   r.HandleFunc("/users/?", usersHandler)
   r.HandleFunc("/users/[0-9]+/?", userHandler)
   r.HandleFunc("/users/[0-9]+/friends/[a-zA-Z]+/?", friendHandler)
+  r.AddStaticResource("static/images")
 
   http.ListenAndServe(":8080", r)
 }
