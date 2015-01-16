@@ -60,15 +60,16 @@ func TestNotFoundRoute(t *testing.T) {
 	}
 }
 
-func TestFoundRegexpRoute(t *testing.T) {
+func TestFoundRouteWithVariables(t *testing.T) {
 	r := new(Router)
-	r.HandleFunc("/test/handler/:id/hello", handlerHello)
+	r.HandleFunc("/test/handler/:id/hello/", handlerHello)
+	r.HandleFunc("/test/handler/:id/hello/:foo", handlerHello)
 
 	urls := []string{
 		"/test/handler/1/hello",
 		"/test/handler/2/hello/",
-		"/test/handler/2123/hello/",
-		"/test/handler/2123/hello",
+		"/test/handler/2123/hello/johndoe",
+		"/test/handler/2123/hello/johndoe/",
 	}
 
 	server := httptest.NewServer(r)
@@ -83,10 +84,9 @@ func TestFoundRegexpRoute(t *testing.T) {
 			t.Fatal(res)
 		}
 	}
-
 }
 
-func TestNotFoundRegexpRoute(t *testing.T) {
+func TestNotFoundRouteWithVariables(t *testing.T) {
 	r := new(Router)
 	r.HandleFunc("/test/handler/:id/hello", handlerHello)
 
@@ -168,6 +168,49 @@ func TestServeNonExistingStaticResources(t *testing.T) {
 	}
 
 	cleanTestingData(rootTestingPath)
+}
+
+func TestMatch(t *testing.T) {
+	params := make(map[string]string)
+	routeWithOneVariable := route{"/test/handler/:id/hello", params, nil}
+	routeWithMultipleVariables := route{"/test/handler/:id/hello/:username", params, nil}
+
+	matchingPattern := "/test/handler/50/hello"
+	if !routeWithOneVariable.match(matchingPattern) {
+		t.Fatal("route should match the pattern: pattern = " + routeWithOneVariable.pattern + ", path = " + matchingPattern)
+	}
+
+	if routeWithOneVariable.params["id"] != "50" {
+		t.Fatal("Value for 'id' is not the expected one: expected = 50, stored = " + routeWithOneVariable.params["id"])
+	}
+
+	nonMatchingPattern := "/test/handler//hello"
+	if !routeWithOneVariable.match(nonMatchingPattern) {
+		t.Fatal("route should not match the pattern: pattern = " + routeWithOneVariable.pattern + ", path = " + nonMatchingPattern)
+	}
+
+	matchingPattern = "/test/handler/johndoe/hello"
+	if !routeWithOneVariable.match(matchingPattern) {
+		t.Fatal("route should match the pattern: pattern = " + routeWithOneVariable.pattern + ", path = " + matchingPattern)
+	}
+
+	if routeWithOneVariable.params["id"] != "johndoe" {
+		t.Fatal("Value for 'id' is not the expected one: expected = johndoe, stored = " + routeWithOneVariable.params["id"])
+	}
+
+	matchingPattern = "/test/handler/50/hello/johndoe"
+	if !routeWithMultipleVariables.match(matchingPattern) {
+		t.Fatal("route should match the pattern: pattern = " + routeWithMultipleVariables.pattern + ", path = " + matchingPattern)
+	}
+
+	if routeWithMultipleVariables.params["id"] != "50" && routeWithMultipleVariables.params["username"] != "johndoe" {
+		t.Fatal("Values stored in map are not the expected ones: expected = [50, john doe], stored = [" + routeWithMultipleVariables.params["id"] + ", " + routeWithMultipleVariables.params["username"] + "]")
+	}
+
+	nonMatchingPattern = "/test/handler/id/hello//"
+	if !routeWithMultipleVariables.match(nonMatchingPattern) {
+		t.Fatal("route should not match the pattern: pattern = " + routeWithMultipleVariables.pattern + ", path = " + nonMatchingPattern)
+	}
 }
 
 func handler1(w http.ResponseWriter, r *http.Request) {

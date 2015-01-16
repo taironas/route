@@ -11,7 +11,7 @@ import (
 // https://github.com/raymi/quickerreference
 type route struct {
 	pattern string
-	params    map[string]string
+	params  map[string]string
 	handler http.Handler
 }
 
@@ -29,8 +29,8 @@ var RouterContext Context
 
 // Handle registers the handler for the given pattern in the router.
 func (r *Router) Handle(pattern string, handler http.Handler) {
-	vars := make(map[string]string)
-	r.routes = append(r.routes, &route{pattern, vars, handler})
+	params := make(map[string]string)
+	r.routes = append(r.routes, &route{pattern, params, handler})
 }
 
 // HandleFunc registers the handler function for the given pattern in the router.
@@ -71,7 +71,7 @@ func (r *Router) AddStaticResource(resource *string) {
 }
 
 // Determine if the path matches the pattern of the route.
-// Fill the vars map with variables found in the path.
+// Fill the params map with variables found in the path.
 func (r *route) match(path string) bool {
 	splitPattern := strings.Split(strings.TrimSuffix(r.pattern, "/"), "/")
 	splitPath := strings.Split(strings.TrimSuffix(path, "/"), "/")
