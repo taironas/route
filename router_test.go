@@ -9,8 +9,8 @@ import (
 )
 
 var endpoints = []string{
-	"/test/handler/1/?",
-	"/test/handler/2/?",
+	"/test/handler/1",
+	"/test/handler/2",
 }
 
 var rootTestingPath = "/temp_TestServeStaticResources"
@@ -62,7 +62,7 @@ func TestNotFoundRoute(t *testing.T) {
 
 func TestFoundRegexpRoute(t *testing.T) {
 	r := new(Router)
-	r.HandleFunc("/test/handler/[0-9]+/hello/?", handlerHello)
+	r.HandleFunc("/test/handler/:id/hello", handlerHello)
 
 	urls := []string{
 		"/test/handler/1/hello",
@@ -88,12 +88,12 @@ func TestFoundRegexpRoute(t *testing.T) {
 
 func TestNotFoundRegexpRoute(t *testing.T) {
 	r := new(Router)
-	r.HandleFunc("/test/handler/[0-9]/hello", handlerHello)
+	r.HandleFunc("/test/handler/:id/hello", handlerHello)
 
 	server := httptest.NewServer(r)
 	defer server.Close()
 
-	res, err := http.Get(server.URL + "/test/handler/a/hello")
+	res, err := http.Get(server.URL + "/test/handler///hello")
 	if err != nil {
 		t.Fatal(err)
 	}
