@@ -20,11 +20,6 @@ type Router struct {
 	staticResources []*string // array of static resources
 }
 
-// Context stores data accessible during a request.
-type Context struct {
-	Params map[string]string // URL parameters.
-}
-
 var RouterContext Context
 
 // Handle registers the handler for the given pattern in the router.
@@ -35,15 +30,14 @@ func (r *Router) Handle(pattern string, handler http.Handler) {
 
 // HandleFunc registers the handler function for the given pattern in the router.
 func (r *Router) HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
-	r.Handle(pattern, http.HandlerFunc(handler))
+	r.Handle(pattern, clearHandler(http.HandlerFunc(handler)))
 }
 
 // ServeHTTP looks for a matching route among the routes. Returns 404 if no match is found.
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-
 	for _, route := range r.routes {
 		if route.match(req.URL.Path) {
-			RouterContext.Params = route.params
+			RouterContext.setParams(req, route.params)
 			route.handler.ServeHTTP(w, req)
 			return
 		}
@@ -70,7 +64,7 @@ func (r *Router) AddStaticResource(resource *string) {
 	r.staticResources = append(r.staticResources, resource)
 }
 
-// Determine if the path matches the pattern of the route.
+// Determines if the path matches the pattern of the route.
 // Fill the params map with variables found in the path.
 func (r *route) match(path string) bool {
 	splitPattern := strings.Split(strings.TrimSuffix(r.pattern, "/"), "/")
@@ -96,4 +90,12 @@ func (r *route) match(path string) bool {
 	}
 
 	return true
+}
+
+// Handler clears the context for a given request.
+func clearHandler(f func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		defer RouterContext.clear(r)
+		f(w, r)
+	}
 }
