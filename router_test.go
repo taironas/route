@@ -2,6 +2,7 @@ package route
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -63,7 +64,7 @@ func TestNotFoundRoute(t *testing.T) {
 func TestFoundRouteWithVariables(t *testing.T) {
 	r := new(Router)
 	r.HandleFunc("/test/handler/:id/hello/", handlerHello)
-	r.HandleFunc("/test/handler/:id/hello/:foo", handlerHello)
+	r.HandleFunc("/test/handler/:id/hello/:foo", handlerHello2)
 
 	urls := []string{
 		"/test/handler/1/hello",
@@ -83,6 +84,24 @@ func TestFoundRouteWithVariables(t *testing.T) {
 		if res.StatusCode != http.StatusOK {
 			t.Fatal(res)
 		}
+	}
+
+	res, _ := http.Get(server.URL + urls[1])
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+	expectedBody := "2"
+	gotBody := string(body)
+	if gotBody != expectedBody {
+		t.Fatal("Expected", expectedBody, "and got", gotBody)
+	}
+
+	res, _ = http.Get(server.URL + urls[2])
+	defer res.Body.Close()
+	body, _ = ioutil.ReadAll(res.Body)
+	expectedBody = "2123,johndoe"
+	gotBody = string(body)
+	if gotBody != expectedBody {
+		t.Fatal("Expected", expectedBody, "and got", gotBody)
 	}
 }
 
@@ -222,7 +241,11 @@ func handler2(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlerHello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "testHandlerHello has been reached!")
+	fmt.Fprintf(w, RouterContext.GetParam(r, "id"))
+}
+
+func handlerHello2(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, RouterContext.GetParam(r, "id")+","+RouterContext.GetParam(r, "foo"))
 }
 
 func createTestingData(rootTestPath string) {

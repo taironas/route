@@ -10,9 +10,9 @@
 //
 //  func main() {
 //    r := new(route.Router)
-//    r.HandleFunc("/users/?", usersHandler)
-//    r.HandleFunc("/users/[0-9]+/?", userHandler)
-//    r.HandleFunc("/users/[0-9]+/friends/[a-zA-Z]+/?", friendHandler)
+//    r.HandleFunc("/users", usersHandler)
+//    r.HandleFunc("/users/:id", userHandler)
+//    r.HandleFunc("/users/:id/friends/:username", friendHandler)
 //
 //    http.ListenAndServe(":8080", r)
 //  }
@@ -22,10 +22,10 @@
 //  }
 //
 //  func userHandler(w http.ResponseWriter, r *http.Request) {
-//    fmt.Fprintf(w, "Welcome to user handler!")
+//    fmt.Fprintf(w, "Welcome to user handler, user id = %s!", route.RouterContext.GetParam(r, "id"))
 //  }
 //
 //  func friendHandler(w http.ResponseWriter, r *http.Request) {
-//    fmt.Fprintf(w, "Welcome to friend handler!")
+//    fmt.Fprintf(w, "Welcome to friend handler, friend username = %s!", route.RouterContext.GetParam(r, "username"))
 //  }
 package route
