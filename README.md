@@ -32,11 +32,11 @@ func usersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func userHandler(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintf(w, "Welcome to user handler, user id = %s!", route.RouterContext.GetParam(r, "id"))
+  fmt.Fprintf(w, "Welcome to user handler, user id = %s!", route.Context.Get(r, "id"))
 }
 
 func friendHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome to friend handler, friend username = %s!", route.RouterContext.GetParam(r, "username"))
+	fmt.Fprintf(w, "Welcome to friend handler, friend username = %s!", route.Context.Get(r, "username"))
 }
 ~~~
 

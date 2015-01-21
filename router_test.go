@@ -241,11 +241,11 @@ func handler2(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlerHello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, RouterContext.GetParam(r, "id"))
+	fmt.Fprintf(w, Context.Get(r, "id"))
 }
 
 func handlerHello2(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, RouterContext.GetParam(r, "id")+","+RouterContext.GetParam(r, "foo"))
+	fmt.Fprintf(w, Context.Get(r, "id")+","+Context.Get(r, "foo"))
 }
 
 func createTestingData(rootTestPath string) {

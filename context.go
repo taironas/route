@@ -7,13 +7,13 @@ import (
 
 // inspired by Brad Fitzpatrick's idea:
 // https://groups.google.com/forum/#!msg/golang-nuts/teSBtPvv1GQ/U12qA9N51uIJ
-type Context struct {
+type context struct {
 	mutex  sync.Mutex
 	params map[*http.Request]map[string]string // URL parameters.
 }
 
-// setParams stores a map of URL paramters for a given request.
-func (c *Context) setParams(req *http.Request, m map[string]string) {
+// set stores a map of URL paramters for a given request.
+func (c *context) set(req *http.Request, m map[string]string) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -24,7 +24,7 @@ func (c *Context) setParams(req *http.Request, m map[string]string) {
 }
 
 // Get returns an URL parameter value for a given key for a given request.
-func (c *Context) GetParam(req *http.Request, key string) string {
+func (c *context) Get(req *http.Request, key string) string {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -35,7 +35,7 @@ func (c *Context) GetParam(req *http.Request, key string) string {
 }
 
 //  clear removes all the key/value pairs for a given request.
-func (c *Context) clear(req *http.Request) {
+func (c *context) clear(req *http.Request) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	delete(c.params, req)

@@ -20,7 +20,7 @@ type Router struct {
 	staticResources []*string // array of static resources
 }
 
-var RouterContext Context
+var Context context
 
 // Handle registers the handler for the given pattern in the router.
 func (r *Router) Handle(pattern string, handler http.Handler) {
@@ -37,7 +37,7 @@ func (r *Router) HandleFunc(pattern string, handler func(http.ResponseWriter, *h
 func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	for _, route := range r.routes {
 		if route.match(req.URL.Path) {
-			RouterContext.setParams(req, route.params)
+			Context.set(req, route.params)
 			route.handler.ServeHTTP(w, req)
 			return
 		}
@@ -95,7 +95,7 @@ func (r *route) match(path string) bool {
 // Handler clears the context for a given request.
 func clearHandler(f func(w http.ResponseWriter, r *http.Request)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer RouterContext.clear(r)
+		defer Context.clear(r)
 		f(w, r)
 	}
 }
