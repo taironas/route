@@ -10,7 +10,7 @@ func TestContext(t *testing.T) {
 
 	var testContext context
 
-	foo := testContext.Get(r, "foo")
+	foo, _ := testContext.Get(r, "foo")
 	if len(foo) > 0 {
 		t.Fatal("Expected an empty string and got", foo)
 	}
@@ -25,7 +25,7 @@ func TestContext(t *testing.T) {
 		t.Fatal("Params map should contained", len(params), "elements. context params length =", len(testContext.params[r]))
 	}
 
-	id := testContext.Get(r, "foo2")
+	id, _ := testContext.Get(r, "foo2")
 	if id != params["foo2"] {
 		t.Fatal("Expected", params["foo2"], "and got", id)
 	}

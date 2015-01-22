@@ -1,6 +1,7 @@
 package route
 
 import (
+	"errors"
 	"net/http"
 	"sync"
 )
@@ -24,14 +25,20 @@ func (c *context) set(req *http.Request, m map[string]string) {
 }
 
 // Get returns an URL parameter value for a given key for a given request.
-func (c *context) Get(req *http.Request, key string) string {
+func (c *context) Get(req *http.Request, key string) (string, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
 	if c.params == nil {
-		return ""
+		return "", errors.New("Parameters map has not been initialized")
 	}
-	return c.params[req][key]
+
+	val, ok := c.params[req][key]
+
+	if !ok {
+		return val, errors.New(key + " Key does not exist in the parameters map")
+	}
+	return val, nil
 }
 
 //  clear removes all the key/value pairs for a given request.

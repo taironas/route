@@ -241,11 +241,14 @@ func handler2(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlerHello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, Context.Get(r, "id"))
+	id, _ := Context.Get(r, "id")
+	fmt.Fprintf(w, id)
 }
 
 func handlerHello2(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, Context.Get(r, "id")+","+Context.Get(r, "foo"))
+	id, _ := Context.Get(r, "id")
+	foo, _ := Context.Get(r, "foo")
+	fmt.Fprintf(w, id+","+foo)
 }
 
 func createTestingData(rootTestPath string) {
