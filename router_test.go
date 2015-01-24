@@ -14,7 +14,7 @@ var endpoints = []string{
 	"/test/handler/2",
 }
 
-var rootTestingPath = "/temp_TestServeStaticResources"
+var rootTestingPath = "temp_TestServeStaticResources"
 
 func TestRouter(t *testing.T) {
 	r := new(Router)
