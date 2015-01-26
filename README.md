@@ -58,6 +58,20 @@ Then run your server:
 
 You will now have a Go net/http webserver running on `localhost:8080`.
 
+## Named Parameters
+
+named paramters are accessible via `route.Context`:
+
+~~~ go
+r.HandleFunc("/hello/:name", helloHandler)
+
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+  fmt.Fprintf(w, "Hello %s!", route.Context.Get(r, "nane"))
+}
+~~~
+
+If same named parameter is used more than one time in a path, it is the value of the last parameter which will be retrieved.
+
 ## Testing
 
 ~~~
