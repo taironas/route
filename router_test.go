@@ -64,7 +64,7 @@ func TestNotFoundRoute(t *testing.T) {
 func TestFoundRouteWithVariables(t *testing.T) {
 	r := new(Router)
 	r.HandleFunc("/test/handler/:id/hello/", handlerHello)
-	r.HandleFunc("/test/handler/:id/hello/:foo", handlerHello2)
+	r.HandleFunc("/test/handler/:id/hello/:f-o-o", handlerHello2)
 
 	urls := []string{
 		"/test/handler/1/hello",
@@ -191,16 +191,16 @@ func TestServeNonExistingStaticResources(t *testing.T) {
 
 func TestMatch(t *testing.T) {
 	params := make(map[string]string)
-	routeWithOneVariable := route{"/test/handler/:id/hello", params, nil}
-	routeWithMultipleVariables := route{"/test/handler/:id/hello/:username", params, nil}
+	routeWithOneVariable := route{"/test/handler/:user_id/hello", params, nil}
+	routeWithMultipleVariables := route{"/test/handler/:user_id/hello/:username", params, nil}
 
 	matchingPattern := "/test/handler/50/hello"
 	if !routeWithOneVariable.match(matchingPattern) {
 		t.Fatal("route should match the pattern: pattern = " + routeWithOneVariable.pattern + ", path = " + matchingPattern)
 	}
 
-	if routeWithOneVariable.params["id"] != "50" {
-		t.Fatal("Value for 'id' is not the expected one: expected = 50, stored = " + routeWithOneVariable.params["id"])
+	if routeWithOneVariable.params["user_id"] != "50" {
+		t.Fatal("Value for 'user_id' is not the expected one: expected = 50, stored = " + routeWithOneVariable.params["user_id"])
 	}
 
 	nonMatchingPattern := "/test/handler//hello"
@@ -213,8 +213,8 @@ func TestMatch(t *testing.T) {
 		t.Fatal("route should match the pattern: pattern = " + routeWithOneVariable.pattern + ", path = " + matchingPattern)
 	}
 
-	if routeWithOneVariable.params["id"] != "johndoe" {
-		t.Fatal("Value for 'id' is not the expected one: expected = johndoe, stored = " + routeWithOneVariable.params["id"])
+	if routeWithOneVariable.params["user_id"] != "johndoe" {
+		t.Fatal("Value for 'user_id' is not the expected one: expected = johndoe, stored = " + routeWithOneVariable.params["user_id"])
 	}
 
 	matchingPattern = "/test/handler/50/hello/johndoe"
@@ -222,11 +222,11 @@ func TestMatch(t *testing.T) {
 		t.Fatal("route should match the pattern: pattern = " + routeWithMultipleVariables.pattern + ", path = " + matchingPattern)
 	}
 
-	if routeWithMultipleVariables.params["id"] != "50" && routeWithMultipleVariables.params["username"] != "johndoe" {
-		t.Fatal("Values stored in map are not the expected ones: expected = [50, john doe], stored = [" + routeWithMultipleVariables.params["id"] + ", " + routeWithMultipleVariables.params["username"] + "]")
+	if routeWithMultipleVariables.params["user_id"] != "50" && routeWithMultipleVariables.params["username"] != "johndoe" {
+		t.Fatal("Values stored in map are not the expected ones: expected = [50, john doe], stored = [" + routeWithMultipleVariables.params["user_id"] + ", " + routeWithMultipleVariables.params["username"] + "]")
 	}
 
-	nonMatchingPattern = "/test/handler/id/hello//"
+	nonMatchingPattern = "/test/handler/:user_id/hello//"
 	if !routeWithMultipleVariables.match(nonMatchingPattern) {
 		t.Fatal("route should not match the pattern: pattern = " + routeWithMultipleVariables.pattern + ", path = " + nonMatchingPattern)
 	}
@@ -245,7 +245,7 @@ func handlerHello(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlerHello2(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, Context.Get(r, "id")+","+Context.Get(r, "foo"))
+	fmt.Fprintf(w, Context.Get(r, "id")+","+Context.Get(r, "f-o-o"))
 }
 
 func createTestingData(rootTestPath string) {
