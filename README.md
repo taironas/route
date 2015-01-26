@@ -66,7 +66,7 @@ named paramters are accessible via `route.Context`:
 r.HandleFunc("/hello/:name", helloHandler)
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintf(w, "Hello %s!", route.Context.Get(r, "nane"))
+  fmt.Fprintf(w, "Hello %s!", route.Context.Get(r, "nanm"))
 }
 ~~~
 
