@@ -81,7 +81,7 @@ func (r *route) match(path string) bool {
 			}
 
 			variable := strings.TrimPrefix(val, ":")
-			if matched, _ := regexp.MatchString("^[a-zA-Z0-9]+$", variable); !matched {
+			if matched, _ := regexp.MatchString("^[a-zA-Z0-9_-]+$", variable); !matched {
 				return false
 			}
 
