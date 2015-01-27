@@ -121,6 +121,30 @@ func TestNotFoundRouteWithVariables(t *testing.T) {
 	}
 }
 
+func TestFoundRouteWithSpecialCharacter(t *testing.T) {
+	r := new(Router)
+	r.HandleFunc("/test/handler/:user_id/hello/:f-o-o", handlerHelloWithSpecialCharacter)
+
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	res, err := http.Get(server.URL + "/test/handler/42/hello/johndoe")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.StatusCode != http.StatusOK {
+		t.Fatal(res)
+	}
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+	expectedBody := "42,johndoe"
+	gotBody := string(body)
+	if gotBody != expectedBody {
+		t.Fatal("Expected", expectedBody, "and got", gotBody)
+	}
+}
+
 func TestServeStaticResources(t *testing.T) {
 
 	createTestingData(rootTestingPath)
@@ -200,7 +224,7 @@ func TestMatch(t *testing.T) {
 	}
 
 	if routeWithOneVariable.params["id"] != "50" {
-		t.Fatal("Value for 'id' is not the expected one: expected = 50, stored = " + routeWithOneVariable.params["id"])
+		t.Fatal("Value for 'user_id' is not the expected one: expected = 50, stored = " + routeWithOneVariable.params["id"])
 	}
 
 	nonMatchingPattern := "/test/handler//hello"
@@ -214,7 +238,7 @@ func TestMatch(t *testing.T) {
 	}
 
 	if routeWithOneVariable.params["id"] != "johndoe" {
-		t.Fatal("Value for 'id' is not the expected one: expected = johndoe, stored = " + routeWithOneVariable.params["id"])
+		t.Fatal("Value for 'user_id' is not the expected one: expected = johndoe, stored = " + routeWithOneVariable.params["id"])
 	}
 
 	matchingPattern = "/test/handler/50/hello/johndoe"
@@ -226,7 +250,7 @@ func TestMatch(t *testing.T) {
 		t.Fatal("Values stored in map are not the expected ones: expected = [50, john doe], stored = [" + routeWithMultipleVariables.params["id"] + ", " + routeWithMultipleVariables.params["username"] + "]")
 	}
 
-	nonMatchingPattern = "/test/handler/id/hello//"
+	nonMatchingPattern = "/test/handler/:id/hello//"
 	if !routeWithMultipleVariables.match(nonMatchingPattern) {
 		t.Fatal("route should not match the pattern: pattern = " + routeWithMultipleVariables.pattern + ", path = " + nonMatchingPattern)
 	}
@@ -249,6 +273,10 @@ func handlerHello2(w http.ResponseWriter, r *http.Request) {
 	id, _ := Context.Get(r, "id")
 	foo, _ := Context.Get(r, "foo")
 	fmt.Fprintf(w, id+","+foo)
+}
+
+func handlerHelloWithSpecialCharacter(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, Context.Get(r, "user_id")+","+Context.Get(r, "f-o-o"))
 }
 
 func createTestingData(rootTestPath string) {
