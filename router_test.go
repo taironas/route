@@ -145,6 +145,22 @@ func TestFoundRouteWithSpecialCharacter(t *testing.T) {
 	}
 }
 
+func TestNotFoundRouteWithSpecialCharacter(t *testing.T) {
+	r := new(Router)
+	r.HandleFunc("/test/handler/:user_id/hello/:f+o+o", handlerHelloWithSpecialCharacter)
+
+	server := httptest.NewServer(r)
+	defer server.Close()
+
+	res, err := http.Get(server.URL + "/test/handler/42/hello/johndoe")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.StatusCode != http.StatusNotFound {
+		t.Fatal(res)
+	}
+}
+
 func TestServeStaticResources(t *testing.T) {
 
 	createTestingData(rootTestingPath)
@@ -276,7 +292,9 @@ func handlerHello2(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlerHelloWithSpecialCharacter(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, Context.Get(r, "user_id")+","+Context.Get(r, "f-o-o"))
+	userId, _ := Context.Get(r, "user_id")
+	foo, _ := Context.Get(r, "f-o-o")
+	fmt.Fprintf(w, userId+","+foo)
 }
 
 func createTestingData(rootTestPath string) {
