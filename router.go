@@ -15,11 +15,13 @@ type route struct {
 	handler http.Handler
 }
 
+// Router serves HTTP requests for added routes and static resources
 type Router struct {
 	routes          []*route  // array of routes with a tuple (pattern, handler)
 	staticResources []*string // array of static resources
 }
 
+// Context holds URL parameters indexed by HTTP request
 var Context context
 
 // Handle registers the handler for the given pattern in the router.
