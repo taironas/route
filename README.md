@@ -60,7 +60,7 @@ You will now have a Go net/http webserver running on `localhost:8080`.
 
 ## Named Parameters
 
-named paramters are accessible via `route.Context`:
+named parameters are accessible via `route.Context`:
 
 ~~~ go
 r.HandleFunc("/hello/:name", helloHandler)
