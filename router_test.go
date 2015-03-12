@@ -292,9 +292,9 @@ func handlerHello2(w http.ResponseWriter, r *http.Request) {
 }
 
 func handlerHelloWithSpecialCharacter(w http.ResponseWriter, r *http.Request) {
-	userId, _ := Context.Get(r, "user_id")
+	userID, _ := Context.Get(r, "user_id")
 	foo, _ := Context.Get(r, "f-o-o")
-	fmt.Fprintf(w, userId+","+foo)
+	fmt.Fprintf(w, userID+","+foo)
 }
 
 func createTestingData(rootTestPath string) {
